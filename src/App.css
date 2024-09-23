@@ -1,18 +1,18 @@
 .oven-scheduler table {
   width: 100%;
+  table-layout: fixed; /* Ensure all columns have equal width */
   border-collapse: collapse;
 }
 
 .oven-scheduler th, .oven-scheduler td {
   border: 1px solid #ddd;
-  padding: 8px;
   text-align: center;
   position: relative;
+  width: 100px; /* Ensures equal width for time slot columns */
 }
 
 .time-slot {
   min-height: 50px;
-  width: 100%;
 }
 
 .time-slot div {
@@ -20,16 +20,68 @@
   box-sizing: border-box;
 }
 
+/* Container for food list */
+.food-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+/* Styling the food list */
 .food-list ul {
   list-style-type: none;
   padding: 0;
-  margin: 0;
+  margin: 20px 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start; /* Align food items to the left */
 }
 
-.food-list li {
-  display: block;
-  font-size: 14px;
+/* Uniform size for each food item */
+.food-list .food-item {
+  width: 100px; /* Fixed width */
+  height: 80px; /* Fixed height for consistency */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
   text-align: center;
-  line-height: 1.5;
-  box-sizing: border-box;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+  margin: 5px 0;
+  padding: 5px;
+  cursor: grab;
+}
+
+/* Table styling */
+table {
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+
+th {
+  background-color: #f8f8f8;
+  padding: 10px;
+  font-weight: bold;
+}
+
+td {
+  padding: 10px;
+  background-color: #fff;
+  vertical-align: middle;
+  border: 1px solid #ddd;
+}
+
+/* Row styling */
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Hover effect for table rows */
+tr:hover {
+  background-color: #ddd;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
 }

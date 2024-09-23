@@ -3,25 +3,25 @@ import { Droppable } from 'react-beautiful-dnd';
 
 function TimeSlotTable({ trays, timeSlots, schedule }) {
   return (
-    <table>
+    <table className="oven-scheduler">
       <thead>
         <tr>
-          <th>Tray</th>
+          <th className="tray-column">Tray</th> {/* Tray column with distinct width */}
           {timeSlots.map((time, index) => (
-            <th key={index}>{time}</th>
+            <th key={index} className="time-slot-column">{time}</th>
           ))}
         </tr>
       </thead>
       <tbody>
         {trays.map((tray, trayIndex) => (
           <tr key={trayIndex}>
-            <td>{tray}</td>
+            <td className="tray-column">{tray}</td> {/* Tray column */}
             {timeSlots.map((_, timeIndex) => {
               const slotId = `${trayIndex}-${timeIndex}`;
               const slot = schedule[slotId];
 
               return (
-                <td key={timeIndex} className="time-slot">
+                <td key={timeIndex} className="time-slot-column time-slot"> {/* Time slot column */}
                   <Droppable droppableId={slotId}>
                     {(provided) => (
                       <div
@@ -33,11 +33,10 @@ function TimeSlotTable({ trays, timeSlots, schedule }) {
                           gap: '5px',
                         }}
                       >
-                        {/* Render multiple food items in the slot */}
                         {slot?.items.map((item, index) => (
                           <div
                             key={index}
-                            title={`${item.title} (${item.duration} mins)`} // Tooltip with title and duration
+                            title={`${item.title} (${item.duration} mins)`}
                             style={{
                               backgroundColor: item.color,
                               width: `${(item.duration / 30) * 100}%`,
