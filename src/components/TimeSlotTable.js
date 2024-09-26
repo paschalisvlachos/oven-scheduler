@@ -1,7 +1,7 @@
 import React from 'react';
 import { Droppable } from 'react-beautiful-dnd';
 
-function TimeSlotTable({ trays, timeSlots, schedule, removeFoodItem }) {
+function TimeSlotTable({ trays, timeSlots, removeFoodItem }) {
   return (
     <table className="oven-scheduler">
       <thead>
@@ -13,27 +13,32 @@ function TimeSlotTable({ trays, timeSlots, schedule, removeFoodItem }) {
         </tr>
       </thead>
       <tbody>
-        {trays.map((tray, trayIndex) => (
-          <tr key={trayIndex}>
-            <td className="tray-column">{tray}</td>
-            {timeSlots.map((_, timeIndex) => {
-              const slotId = `${trayIndex}-${timeIndex}`;
-              const slot = schedule[slotId];
+        {trays.map((tray, trayIndex) => {
+          const filledTimeSlots = Array(timeSlots.length).fill(null);
+          tray.timeSlots?.forEach(slot => {
+            if (slot.timeSlotIndex >= 0 && slot.timeSlotIndex < timeSlots.length) {
+              filledTimeSlots[slot.timeSlotIndex] = slot;
+            }
+          });
 
-              return (
-                <td key={timeIndex} className="time-slot-column time-slot">
-                  <Droppable droppableId={slotId}>
-                    {(provided) => (
-                      <div
-                        ref={provided.innerRef}
-                        {...provided.droppableProps}
-                        style={{
-                          minHeight: '50px',
-                          display: 'flex',
-                          gap: '5px',
-                        }}
-                      >
-                        {slot?.items.map((item, index) => (
+          return (
+            <tr key={trayIndex}>
+              <td className="tray-column">Tray {tray.trayIndex || trayIndex + 1}</td>
+              {filledTimeSlots.map((slot, timeIndex) => (
+              <td key={timeIndex} className="time-slot-column time-slot">
+                <Droppable droppableId={`${trayIndex}-${timeIndex}`}>
+                  {(provided) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.droppableProps}
+                      style={{
+                        minHeight: '50px',
+                        display: 'flex',
+                        gap: '5px',
+                      }}
+                    >
+                      {slot && slot.items ? (
+                        slot.items.map((item, index) => (
                           <div
                             key={index}
                             style={{
@@ -45,7 +50,6 @@ function TimeSlotTable({ trays, timeSlots, schedule, removeFoodItem }) {
                             }}
                           >
                             {item.title} ({item.duration} mins)
-                            {/* Remove Button */}
                             <button
                               style={{
                                 position: 'absolute',
@@ -62,16 +66,19 @@ function TimeSlotTable({ trays, timeSlots, schedule, removeFoodItem }) {
                               X
                             </button>
                           </div>
-                        ))}
-                        {provided.placeholder}
-                      </div>
-                    )}
-                  </Droppable>
-                </td>
-              );
-            })}
-          </tr>
-        ))}
+                        ))
+                      ) : (
+                        <div style={{ flexGrow: 1 }}> {/* Render empty placeholder for null slots */} </div>
+                      )}
+                      {provided.placeholder}
+                    </div>
+                  )}
+                </Droppable>
+              </td>
+            ))}
+            </tr>
+          );
+        })}
       </tbody>
     </table>
   );

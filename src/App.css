@@ -85,3 +85,16 @@ tr:hover {
   background-color: #ddd;
   box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow for depth */
 }
+
+.date-navigation {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.date-navigation span {
+  margin: 0 10px;
+  font-size: 18px;
+  font-weight: bold;
+}
