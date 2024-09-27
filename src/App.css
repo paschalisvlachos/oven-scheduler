@@ -1,14 +1,16 @@
-.oven-scheduler table {
-  width: 100%;
-  table-layout: fixed; /* Ensure all columns have equal width */
-  border-collapse: collapse;
+.oven-scheduler-container {
+  width: 100%; /* Take full width of the container */
+  overflow-x: auto; /* Enable horizontal scrolling */
+}
+
+.oven-scheduler {
+  width: max-content; /* Expand the table to fit its content */
+  table-layout: auto; /* Adjust the width of columns based on content */
 }
 
 .oven-scheduler th, .oven-scheduler td {
-  border: 1px solid #ddd;
-  text-align: center;
+  width: 100px; /* Keep the fixed width for each time slot */
   position: relative;
-  width: 100px; /* Ensures equal width for time slot columns */
 }
 
 .time-slot {
@@ -69,7 +71,6 @@ th {
 }
 
 td {
-  padding: 10px;
   background-color: #fff;
   vertical-align: middle;
   border: 1px solid #ddd;
@@ -97,4 +98,14 @@ tr:hover {
   margin: 0 10px;
   font-size: 18px;
   font-weight: bold;
+}
+
+.current-time-line {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: red;
+  z-index: 10;
+  transition: left 30s linear; /* Smooth transition for real-time updates */
 }

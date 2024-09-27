@@ -19,6 +19,12 @@ function OvenScheduler() {
   const [schedule, setSchedule] = useState({ trays: Array(20).fill({ timeSlots: [] }) });
   const [alertMessage, setAlertMessage] = useState(''); // For showing alert messages
   const [currentDate, setCurrentDate] = useState(formatISO(new Date(), { representation: 'date' }));
+  const [currentTimePosition, setCurrentTimePosition] = useState(null);
+
+  useEffect(() => {
+    const position = getCurrentTimeSlotPosition(timeSlots);
+    setCurrentTimePosition(position);
+  }, [timeSlots]);
 
   useEffect(() => {
     axios.get('/api/foods')
@@ -27,6 +33,20 @@ function OvenScheduler() {
 
     fetchScheduleForDate(currentDate);
   }, [currentDate]);
+
+  useEffect(() => {
+    const timeSlotWidth = 100; // Ensure this matches the CSS width for time slots
+  
+    const updateCurrentTimePosition = () => {
+      const position = getCurrentTimeSlotPosition(timeSlots, timeSlotWidth);
+      setCurrentTimePosition(position);
+    };
+  
+    updateCurrentTimePosition(); // Run on component mount
+    const intervalId = setInterval(updateCurrentTimePosition, 30000); // Update every 30 seconds
+  
+    return () => clearInterval(intervalId); // Clean up interval on unmount
+  }, [timeSlots]);           
 
   const fetchScheduleForDate = (date) => {
     axios.get(`/api/schedules/${date}`)
@@ -218,6 +238,38 @@ function OvenScheduler() {
     setTimeout(() => setAlertMessage(''), 5000); // Clear alert after 5 seconds
   };             
 
+  function getCurrentTimeSlotPosition(timeSlots, timeSlotWidth) {
+    const currentTime = new Date();
+    const currentHour = currentTime.getHours();
+    const currentMinutes = currentTime.getMinutes();
+  
+    // Total minutes since the start of the day
+    const totalMinutesInDay = currentHour * 60 + currentMinutes;
+  
+    // Define the start time of the schedule (6:00 AM)
+    const startTimeInMinutes = 6 * 60; // 6:00 AM = 360 minutes
+  
+    // Calculate how many minutes have passed since 6:00 AM
+    const totalElapsedMinutes = totalMinutesInDay - startTimeInMinutes;
+  
+    // If the current time is before 6:00 AM, return the first slot with no offset
+    if (totalElapsedMinutes < 0) {
+      return { slotIndex: 0, offsetPixels: 0 };
+    }
+  
+    // Calculate which 30-minute time slot we're in
+    const slotIndex = Math.floor(totalElapsedMinutes / 30);
+  
+    // Calculate how many minutes have passed within the current 30-minute slot
+    const minutesSinceSlotStart = totalElapsedMinutes % 30;
+  
+    // Convert the minutes within the slot to a pixel offset based on the time slot width
+    const offsetPixels = (minutesSinceSlotStart / 30) * timeSlotWidth;
+  
+    // Return both the time slot index and the pixel offset for accurate positioning
+    return { slotIndex: slotIndex + 1, offsetPixels };
+  }                 
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <div className="container">
@@ -266,7 +318,14 @@ function OvenScheduler() {
               )}
             </Droppable>
           </div>
-          <TimeSlotTable trays={schedule.trays} timeSlots={timeSlots} removeFoodItem={removeFoodItem} />
+          <div className="oven-scheduler-container">
+          <TimeSlotTable
+            trays={schedule.trays}
+            timeSlots={timeSlots}
+            removeFoodItem={removeFoodItem}
+            currentTimePosition={currentTimePosition} // Pass the current time position
+          />
+          </div>
         </div>
       </div>
     </DragDropContext>
